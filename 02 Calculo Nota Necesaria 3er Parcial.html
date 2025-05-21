@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cálculo Nota 3er Parcial</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eef2f3;
+      margin: 0;
+      padding: 0;
+    }
+
+    nav {
+      background-color: #0077cc;
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      padding: 15px 10px;
+      font-size: 16px;
+    }
+
+    nav button {
+      background: none;
+      border: none;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    nav button:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      background-color: #ffffff;
+      max-width: 400px;
+      margin: 20px auto;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-align: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .header img {
+      width: 50px;
+      height: 50px;
+    }
+
+    .header h2 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.3;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+
+    input[readonly] {
+      background-color: #f0f0f0;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    button.calc-btn {
+      padding: 12px;
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button.calc-btn:hover {
+      background-color: #005fa3;
+    }
+
+    #creditos {
+      display: none;
+      text-align: center;
+      font-size: 16px;
+      line-height: 1.6;
+      white-space: pre-line;
+      margin-top: 30px;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <button onclick="mostrarSeccion('inicio')">Inicio</button>
+    <button onclick="mostrarSeccion('creditos')">Créditos</button>
+    <button onclick="salir()">Salir</button>
+  </nav>
+<center>
+<br>
+  <div class="banner">
+    <img src="https://sanagustin.edu.co/wp-content/uploads/2023/02/sanagustin.svg" alt="Banner académico" />
+  </div>
+</center>
+  <div id="inicio" class="container">
+    <div class="header">
+      <h2>CÁLCULO NOTA<br>3ER PARCIAL</h2>
+    </div>
+
+    <label for="nota1">Nota Primer Parcial (30%):</label>
+    <input type="number" id="nota1" min="0" max="5" step="0.01">
+
+    <label for="nota2">Nota Segundo Parcial (30%):</label>
+    <input type="number" id="nota2" min="0" max="5" step="0.01">
+
+    <label for="nota3">Nota Necesaria Tercer Parcial (40%):</label>
+    <input type="number" id="nota3" readonly>
+
+    <div class="buttons">
+      <button class="calc-btn" onclick="calcularNota()">CALCULAR NOTA</button>
+      <button class="calc-btn" onclick="reiniciar()">NUEVO CÁLCULO</button>
+    </div>
+  </div>
+
+  <div id="creditos" class="container" style="display: none;">
+    <h3>Créditos</h3>
+    <p>
+      Este proyecto fue desarrollado<br>
+      por estudiantes de 3er semestre<br>
+      del programa de Sistemas y Redes<br>
+      del Instituto Tecnológico San Agustín<br>
+      asesorados por docentes del programa
+    </p>
+  </div>
+
+  <script>
+    function calcularNota() {
+      const nota1 = parseFloat(document.getElementById('nota1').value);
+      const nota2 = parseFloat(document.getElementById('nota2').value);
+      const nota3 = document.getElementById('nota3');
+
+      if (isNaN(nota1) || isNaN(nota2)) {
+        alert("Por favor ingrese ambas notas.");
+        return;
+      }
+
+      if (nota1 < 0 || nota1 > 5 || nota2 < 0 || nota2 > 5) {
+        alert("Las notas deben estar entre 0 y 5.");
+        return;
+      }
+
+      const necesaria = (3.0 - (nota1 * 0.3 + nota2 * 0.3)) / 0.4;
+      nota3.value = necesaria.toFixed(2);
+
+      if (necesaria > 5) {
+        alert("Con esas notas, no es posible alcanzar 3.0. Necesitarías más de 5.0.");
+      }
+    }
+
+    function reiniciar() {
+      document.getElementById('nota1').value = '';
+      document.getElementById('nota2').value = '';
+      document.getElementById('nota3').value = '';
+    }
+
+    function mostrarSeccion(seccion) {
+      document.getElementById('inicio').style.display = seccion === 'inicio' ? 'block' : 'none';
+      document.getElementById('creditos').style.display = seccion === 'creditos' ? 'block' : 'none';
+    }
+
+    function salir() {
+      alert("Gracias por utilizar esta herramienta.");
+      window.location.href = "about:blank"; // Puedes cambiar por otra URL como "https://www.google.com"
+    }
+
+    window.addEventListener('beforeunload', function (e) {
+      const mensaje = "Este proyecto fue desarrollado\npor estudiantes de 3er semestre\ndel programa de Sistemas y Redes\ndel Instituto Tecnológico San Agustín\nasesorados por docentes del programa";
+      e.preventDefault();
+      e.returnValue = mensaje;
+      return mensaje;
+    });
+  </script>
+
+</body>
+</html>

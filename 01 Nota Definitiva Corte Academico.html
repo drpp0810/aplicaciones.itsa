@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cálculo Nota Corte Académico</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eef2f3;
+      margin: 0;
+      padding: 0;
+    }
+
+    nav {
+      background-color: #0077cc;
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      padding: 15px 10px;
+      font-size: 16px;
+    }
+
+    nav button {
+      background: none;
+      border: none;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    nav button:hover {
+      text-decoration: underline;
+    }
+
+    .banner {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .banner img {
+      width: 90%;
+      max-width: 400px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .container {
+      background-color: #ffffff;
+      max-width: 500px;
+      margin: 20px auto;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 12px;
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #005fa3;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #resultado {
+      text-align: center;
+      font-size: 18px;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <button onclick="mostrarSeccion('instancia1')">Inicio</button>
+    <button onclick="reiniciarTodo()">Reiniciar</button>
+  </nav>
+
+  <div class="banner">
+    <img src="https://sanagustin.edu.co/wp-content/uploads/2023/02/sanagustin.svg" alt="Banner académico" />
+  </div>
+
+  <div class="container" id="instancia1">
+    <h2>1️⃣ Datos del Corte Académico</h2>
+    <label for="valorCorte">Valor del corte académico (%)</label>
+    <input type="number" id="valorCorte" min="1" max="100">
+
+    <label for="numActividades">Cantidad de actividades</label>
+    <input type="number" id="numActividades" min="1" max="10">
+
+    <div class="buttons">
+      <button onclick="irAInstancia2()">Continuar</button>
+    </div>
+  </div>
+
+  <div class="container hidden" id="instancia2">
+    <h2>2️⃣ Asignar nombres y valores porcentuales</h2>
+    <form id="formActividades"></form>
+    <div class="buttons">
+      <button onclick="validarDistribucion()">Continuar</button>
+    </div>
+  </div>
+
+  <div class="container hidden" id="instancia3">
+    <h2>3️⃣ Ingresar notas de cada actividad</h2>
+    <form id="formNotas"></form>
+    <div class="buttons">
+      <button onclick="calcularNotaFinal()">Calcular Nota Final del Corte</button>
+    </div>
+    <div id="resultado"></div>
+  </div>
+
+  <script>
+    let valorCorte = 0;
+    let numActividades = 0;
+    let actividades = [];
+
+    function mostrarSeccion(id) {
+      document.getElementById("instancia1").classList.add("hidden");
+      document.getElementById("instancia2").classList.add("hidden");
+      document.getElementById("instancia3").classList.add("hidden");
+      document.getElementById(id).classList.remove("hidden");
+    }
+
+    function irAInstancia2() {
+      valorCorte = parseFloat(document.getElementById("valorCorte").value);
+      numActividades = parseInt(document.getElementById("numActividades").value);
+
+      if (isNaN(valorCorte) || isNaN(numActividades) || valorCorte <= 0 || numActividades <= 0) {
+        alert("Por favor ingresa datos válidos.");
+        return;
+      }
+
+      const form = document.getElementById("formActividades");
+      form.innerHTML = "";
+
+      for (let i = 0; i < numActividades; i++) {
+        form.innerHTML += `
+          <label>Nombre de la actividad ${i + 1}:</label>
+          <input type="text" id="nombre${i}" required>
+          <label>Porcentaje de la actividad ${i + 1} (respecto al corte):</label>
+          <input type="number" id="porcentaje${i}" min="0" max="${valorCorte}" required>
+        `;
+      }
+
+      mostrarSeccion("instancia2");
+    }
+
+    function validarDistribucion() {
+      actividades = [];
+      let suma = 0;
+
+      for (let i = 0; i < numActividades; i++) {
+        const nombre = document.getElementById(`nombre${i}`).value.trim();
+        const porcentaje = parseFloat(document.getElementById(`porcentaje${i}`).value);
+
+        if (!nombre || isNaN(porcentaje) || porcentaje < 0 || porcentaje > valorCorte) {
+          alert(`Datos inválidos para la actividad ${i + 1}`);
+          return;
+        }
+
+        actividades.push({ nombre, porcentaje });
+        suma += porcentaje;
+      }
+
+      if (Math.abs(suma - valorCorte) > 0.01) {
+        alert(`La suma de los porcentajes debe ser exactamente ${valorCorte}%. Actualmente es: ${suma.toFixed(2)}%.`);
+        return;
+      }
+
+      const form = document.getElementById("formNotas");
+      form.innerHTML = "";
+
+      actividades.forEach((act, i) => {
+        form.innerHTML += `
+          <label>Nota de "${act.nombre}":</label>
+          <input type="number" id="nota${i}" min="0" max="5" step="0.01" required>
+        `;
+      });
+
+      mostrarSeccion("instancia3");
+    }
+
+    function calcularNotaFinal() {
+      let notaFinal = 0;
+
+      for (let i = 0; i < actividades.length; i++) {
+        const nota = parseFloat(document.getElementById(`nota${i}`).value);
+
+        if (isNaN(nota) || nota < 0 || nota > 5) {
+          alert(`Nota inválida para la actividad "${actividades[i].nombre}"`);
+          return;
+        }
+
+        notaFinal += (nota * actividades[i].porcentaje) / valorCorte;
+      }
+
+      document.getElementById("resultado").textContent = `✅ Nota final del corte: ${notaFinal.toFixed(2)}`;
+    }
+
+    function reiniciarTodo() {
+      location.reload();
+    }
+  </script>
+
+</body>
+</html>
